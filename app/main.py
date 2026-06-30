@@ -1,48 +1,83 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.database.database import Base, engine, SessionLocal
-from app.models.user import User
-from app.core.security import hash_password
 
+from app.database.database import SessionLocal, Base, engine
+from app.models.user import User
+from app.models.menu import Menu
+from app.models.role import Role
+from app.models.role_permission import RolePermission
+from app.core.security import hash_password
+from app.services.menu.menu_service import create_default_menus
 from app.routers.auth import router as auth_router
 from app.routers.admin.users import router as admin_user_router
+from sqlalchemy import text
+from sqlalchemy import inspect
+from app.routers.auth import router as auth_router
+from app.routers.admin.users import router as admin_user_router
+from app.routers.admin.menu import router as admin_menu_router
+from app.routers.admin.permissions import router as admin_permission_router
+from app.services.menu.menu_service import create_default_menus, create_default_permissions
+inspector = inspect(engine)
+print("Tables in DB:", inspector.get_table_names())
+with engine.connect() as conn:
+    result = conn.execute(text("""
+        SELECT current_database(),
+               current_schema(),
+               inet_server_addr(),
+               inet_server_port();
+    """)).fetchone()
 
-app = FastAPI()
+    print(result)
 
+# Create all tables
 Base.metadata.create_all(bind=engine)
-
-# -----------------------------
-# AUTO ADMIN (ON STARTUP)
-# -----------------------------
-@app.on_event("startup")
-def create_default_admin():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     db = SessionLocal()
 
-    admin = db.query(User).filter(User.role == "admin").first()
+    # STEP 1: ROLES — seed both admin and user roles
+    default_roles = ["admin", "user"]
+    role_objects = {}
+
+    for role_name in default_roles:
+        role = db.query(Role).filter_by(role_name=role_name).first()
+        if not role:
+            role = Role(role_name=role_name)
+            db.add(role)
+            db.commit()
+            db.refresh(role)
+        role_objects[role_name] = role
+
+    admin_role = role_objects["admin"]
+
+    # STEP 2: USER
+    admin = db.query(User).filter_by(username="admin").first()
 
     if not admin:
-        new_admin = User(
+        admin = User(
             username="admin",
             password=hash_password("admin123"),
-            role="admin"
+            role_id=admin_role.id,
+            is_active=True
         )
-
-        db.add(new_admin)
+        db.add(admin)
         db.commit()
-        print("🔥 Default admin created -> admin / admin123")
 
+    # STEP 3: MENUS
+    create_default_menus(db)
+    create_default_permissions(db)
     db.close()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 
-# -----------------------------
-# ROUTERS
-# -----------------------------
+# Routers
 app.include_router(auth_router)
 app.include_router(admin_user_router)
+app.include_router(admin_menu_router)
+app.include_router(admin_permission_router)
 
-
-# -----------------------------
-# HOME
-# -----------------------------
 @app.get("/")
 def home():
-    return {"message": "Construction API Running 🚀"}
+    return {"message": "API Running 🚀"}
