@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-
+from app.models.subscription import Subscription
 from app.database.database import SessionLocal, Base, engine
 from app.models.user import User
 from app.models.menu import Menu
@@ -17,6 +17,7 @@ from app.routers.admin.users import router as admin_user_router
 from app.routers.admin.menu import router as admin_menu_router
 from app.routers.admin.permissions import router as admin_permission_router
 from app.services.menu.menu_service import create_default_menus, create_default_permissions
+from app.routers.admin.dashboard import router as dashboard_router
 inspector = inspect(engine)
 print("Tables in DB:", inspector.get_table_names())
 with engine.connect() as conn:
@@ -88,7 +89,7 @@ app.include_router(auth_router)
 app.include_router(admin_user_router)
 app.include_router(admin_menu_router)
 app.include_router(admin_permission_router)
-
+app.include_router(dashboard_router)
 @app.get("/")
 def home():
     return {"message": "API Running 🚀"}

@@ -15,7 +15,14 @@ def get_menus(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
-    menus = get_menus_by_role(db, user["role_id"])
+    print(user)
+    # menus = get_menus_by_role(db, user["role_id"])
+    menus = get_menus_by_role(
+    db=db,
+    role_id=user["role_id"],
+    role_name=user["role"],
+    show_all_menus=user.get("show_all_menus", False)
+)
 
     return {
         "success": True,
