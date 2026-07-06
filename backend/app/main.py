@@ -1,35 +1,39 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.models.subscription import Subscription
+from app.models.admin.pages.subscription import Subscription
 from app.database.database import SessionLocal, Base, engine
-from app.models.user import User
-from app.models.menu import Menu
-from app.models.role import Role
-from app.models.role_permission import RolePermission
+from app.models.admin.pages.user import User
+from app.models.admin.menu.menu import Menu
+from app.models.admin.menu.role import Role
+from app.models.admin.menu.role_permission import RolePermission
 from app.core.security import hash_password
-from app.services.menu.menu_service import create_default_menus
-from app.routers.auth import router as auth_router
-from app.routers.admin.users import router as admin_user_router
+from app.services.admin.menu.menu_service import create_default_menus
+from app.routers.admin.authrz.auth import router as auth_router
+from app.routers.admin.pages.users import router as admin_user_router
 from sqlalchemy import text
 from sqlalchemy import inspect
-from app.routers.auth import router as auth_router
-from app.routers.admin.users import router as admin_user_router
-from app.routers.admin.menu import router as admin_menu_router
-from app.routers.admin.permissions import router as admin_permission_router
-from app.services.menu.menu_service import create_default_menus, create_default_permissions
-from app.routers.admin.dashboard import router as dashboard_router
+from app.routers.admin.authrz.auth import router as auth_router
+from app.routers.admin.pages.users import router as admin_user_router
+from app.routers.admin.authrz.menu import router as admin_menu_router
+from app.routers.admin.authrz.permissions import router as admin_permission_router
+from app.services.admin.menu.menu_service import create_default_menus, create_default_permissions
+from app.routers.admin.pages.dashboard import router as dashboard_router
+from app.routers.admin.pages import profile
+from app.routers.admin.pages.settings import router as settings_router
+from app.models.admin.pages.subscription import Subscription
+from app.models.admin.pages.settings import SystemSettings
 inspector = inspect(engine)
-print("Tables in DB:", inspector.get_table_names())
-with engine.connect() as conn:
-    result = conn.execute(text("""
-        SELECT current_database(),
-               current_schema(),
-               inet_server_addr(),
-               inet_server_port();
-    """)).fetchone()
+# print("Tables in DB:", inspector.get_table_names())
+# with engine.connect() as conn:
+#     result = conn.execute(text("""
+#         SELECT current_database(),
+#                current_schema(),
+#                inet_server_addr(),
+#                inet_server_port();
+#     """)).fetchone()
 
-    print(result)
-
+#     print(result)
+print(Base.metadata.tables.keys())
 # Create all tables
 Base.metadata.create_all(bind=engine)
 @asynccontextmanager
@@ -90,6 +94,9 @@ app.include_router(admin_user_router)
 app.include_router(admin_menu_router)
 app.include_router(admin_permission_router)
 app.include_router(dashboard_router)
+app.include_router(profile.router)
+app.include_router(settings_router)
+
 @app.get("/")
 def home():
     return {"message": "API Running 🚀"}

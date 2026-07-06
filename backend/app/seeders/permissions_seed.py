@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models import Role, Menu, RolePermission
+from app.models.admin.menu import Role, Menu, RolePermission
 
 def seed_admin_permissions(db: Session):
     admin = db.query(Role).filter(Role.role_name == "Admin").first()

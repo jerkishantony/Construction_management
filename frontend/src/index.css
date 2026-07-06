@@ -1,0 +1,17 @@
+#root {
+  width: 100%;
+  min-height: 100vh;
+
+}.swal-top {
+  z-index: 20000 !important;
+}
+
+.swal2-container {
+  z-index: 20000 !important;
+}
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* prevent the page itself from ever scrolling */
+}
