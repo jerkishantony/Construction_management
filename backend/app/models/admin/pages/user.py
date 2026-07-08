@@ -28,5 +28,3 @@ class User(Base):
     role = relationship("Role")
 
     subscription = relationship("Subscription",back_populates="user",uselist=False)
-
-    # system_settings = relationship("SystemSettings",back_populates="user",uselist=False)

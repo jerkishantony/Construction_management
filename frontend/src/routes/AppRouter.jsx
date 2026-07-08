@@ -9,6 +9,9 @@ import UsersPage from "../pages/users/UsersPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
+import MenuPage from "../pages/menu/MenuPage";
+import PermissionPage from "../pages/permissions/PermissionPage";
+
 
 function AppRouter() {
   return (
@@ -34,22 +37,16 @@ function AppRouter() {
           <Route path="/roles" element={<h2>Roles Management</h2>} />
 
           {/* Permission Management */}
-          <Route
-            path="/permissions"
-            element={<h2>Permissions Management</h2>}
-          />
+       <Route path="/permissions" element={<PermissionPage />} />
 
           {/* Menu Management */}
-          <Route
-            path="/menus"
-            element={<h2>Menu Management</h2>}
-          />
+         <Route path="/menus" element={<MenuPage />}/>
 
           {/* Settings */}
-       <Route path="/settings" element={<SettingsPage />} />
+         <Route path="/settings" element={<SettingsPage />} />
 
           {/* Construction Modules */}
-        <Route path="/profile" element={<ProfilePage />} />
+         <Route path="/profile" element={<ProfilePage />} />
           <Route
             path="/attendance"
             element={<h2>Attendance</h2>}

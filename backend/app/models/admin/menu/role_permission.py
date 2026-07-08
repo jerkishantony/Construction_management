@@ -8,6 +8,8 @@ class RolePermission(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     role_id = Column(Integer, ForeignKey("roles.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))   # <-- ADD THIS
+
     menu_id = Column(Integer, ForeignKey("menus.id"))
 
     can_view = Column(Boolean, default=False)

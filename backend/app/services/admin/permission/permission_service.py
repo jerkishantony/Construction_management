@@ -1,22 +1,28 @@
 from sqlalchemy.orm import Session
+
 from app.models.admin.menu.menu import Menu
 from app.models.admin.menu.role_permission import RolePermission
+from app.models.admin.pages.user import User
 
 
 # -------------------------
-# GET ROLE PERMISSIONS
+# GET USER PERMISSIONS
 # -------------------------
-def get_role_permissions(db: Session, role_id: int):
+def get_user_permissions(db: Session, user_id: int):
 
     menus = db.query(Menu).order_by(Menu.display_order).all()
 
     result = []
 
     for menu in menus:
-        perm = db.query(RolePermission).filter_by(
-            role_id=role_id,
-            menu_id=menu.id
-        ).first()
+        perm = (
+            db.query(RolePermission)
+            .filter(
+                RolePermission.user_id == user_id,
+                RolePermission.menu_id == menu.id
+            )
+            .first()
+        )
 
         result.append({
             "menu_id": menu.id,
@@ -36,15 +42,20 @@ def get_role_permissions(db: Session, role_id: int):
 # -------------------------
 def update_permission(db: Session, data):
 
-    perm = db.query(RolePermission).filter_by(
-        role_id=data.role_id,
-        menu_id=data.menu_id
-    ).first()
+    perm = (
+        db.query(RolePermission)
+        .filter(
+            RolePermission.user_id == data.user_id,
+            RolePermission.menu_id == data.menu_id
+        )
+        .first()
+    )
 
     if not perm:
         perm = RolePermission(
             role_id=data.role_id,
-            menu_id=data.menu_id
+            user_id=data.user_id,
+            menu_id=data.menu_id,
         )
         db.add(perm)
 
@@ -59,24 +70,28 @@ def update_permission(db: Session, data):
 
 
 # -------------------------
-# BULK SAVE PERMISSIONS
+# SAVE ALL PERMISSIONS
 # -------------------------
-def save_all_permissions(db: Session, role_id: int, permissions: list):
+def save_all_permissions(db: Session, user_id: int, permissions):
 
     db.query(RolePermission).filter(
-        RolePermission.role_id == role_id
+        RolePermission.user_id == user_id
     ).delete()
 
     for p in permissions:
-        db.add(RolePermission(
-            role_id=role_id,
-            menu_id=p["menu_id"],
-            can_view=p.get("can_view", False),
-            can_create=p.get("can_create", False),
-            can_edit=p.get("can_edit", False),
-            can_delete=p.get("can_delete", False),
-        ))
+        user = db.query(User).filter(User.id == user_id).first()
+        db.add(
+            RolePermission(
+                user_id=user_id,
+                role_id=user.role_id,  # temporary (or fetch from users table)
+                menu_id=p["menu_id"],
+                can_view=p.get("can_view", False),
+                can_create=p.get("can_create", False),
+                can_edit=p.get("can_edit", False),
+                can_delete=p.get("can_delete", False),
+            )
+        )
 
     db.commit()
 
-    return {"message": "All permissions saved successfully"}
+    return {"message": "Permissions saved successfully"}
