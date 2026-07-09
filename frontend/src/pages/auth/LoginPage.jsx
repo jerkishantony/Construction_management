@@ -159,7 +159,7 @@ localStorage.setItem("role_id", response.data.user.role_id);
               color="text.secondary"
               mb={4}
             >
-              Sign in to manage your projects
+              Login in to manage your projects
             </Typography>
 
             <TextField

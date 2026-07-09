@@ -1,0 +1,15 @@
+{
+  "dashboard": "Dashboard",
+  "settings": "Settings",
+  "general_settings": "General Settings",
+  "save": "Save Settings",
+  "saving": "Saving...",
+  "language": "Language",
+  "time_zone": "Time Zone",
+  "email_notifications": "Email Notifications",
+  "sms_notifications": "SMS Notifications",
+  "dark_mode": "Dark Mode (Coming Soon)",
+  "compact_sidebar": "Compact Sidebar",
+  "save_success": "Settings saved successfully.",
+  "save_failed": "Failed to save settings."
+}

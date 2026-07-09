@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.admin.menu.menu import Menu
 from app.models.admin.menu.role_permission import RolePermission
 from app.models.admin.pages.user import User
+from app.services.admin.menu.menu_service import ADMIN_DEFAULT_MENU_KEYS
 
 
 # -------------------------
@@ -10,7 +11,12 @@ from app.models.admin.pages.user import User
 # -------------------------
 def get_user_permissions(db: Session, user_id: int):
 
-    menus = db.query(Menu).order_by(Menu.display_order).all()
+    menus = (
+    db.query(Menu)
+    .filter(~Menu.menu_key.in_(ADMIN_DEFAULT_MENU_KEYS))
+    .order_by(Menu.display_order)
+    .all()
+)
 
     result = []
 

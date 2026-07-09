@@ -192,24 +192,41 @@ await api.post("/admin/permissions/save-all", payload);
           Permission Management
         </Typography>
 
-        <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel>Select User</InputLabel>
-              <Select
-                value={selectedUser}
-                label="Select User"
-                onChange={(e) => setSelectedUser(e.target.value)}
-              >
-                {users.map((user) => (
-                  <MenuItem key={user.id} value={user.id}>
-                    {user.full_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
+       <Grid item xs={6} md={3}>
+  <FormControl fullWidth>
+    <InputLabel>Select User</InputLabel>
+    <Select
+      value={selectedUser}
+      label="Select User"
+      onChange={(e) => setSelectedUser(e.target.value)}
+      sx={{
+        fontSize: "1.1rem",
+        "& .MuiSelect-select": {
+          py: 1.8,
+        },
+      }}
+      MenuProps={{
+        PaperProps: {
+          sx: {
+            maxHeight: 400,
+            "& .MuiMenuItem-root": {
+              fontSize: "1.05rem",
+              py: 1.2,
+            },
+          },
+        },
+      }}
+    >
+     {users
+  .filter((user) => user.full_name && user.full_name.trim() !== "")
+  .map((user) => (
+    <MenuItem key={user.id} value={user.id}>
+      {user.full_name}
+    </MenuItem>
+  ))}
+    </Select>
+  </FormControl>
+</Grid>
 
         {selectedUser && (
           <>

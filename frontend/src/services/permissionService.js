@@ -8,6 +8,10 @@ const permissionService = {
   savePermissions(data) {
     return api.post("/admin/permissions/save-all", data);
   },
+
+  getUserPermissions: (userId) =>
+    api.get(`/admin/permissions/${userId}`),
+
 };
 
 export default permissionService;

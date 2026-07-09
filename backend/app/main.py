@@ -23,6 +23,7 @@ from app.routers.admin.pages.settings import router as settings_router
 from app.models.admin.pages.subscription import Subscription
 from app.models.admin.pages.settings import SystemSettings
 from app.routers.admin.authrz import roles
+from app.api.user.menu import router as user_menu_router
 inspector = inspect(engine)
 # print("Tables in DB:", inspector.get_table_names())
 # with engine.connect() as conn:
@@ -98,6 +99,7 @@ app.include_router(dashboard_router)
 app.include_router(profile.router)
 app.include_router(settings_router)
 app.include_router(roles.router)
+app.include_router(user_menu_router)
 
 @app.get("/")
 def home():

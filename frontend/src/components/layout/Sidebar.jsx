@@ -12,7 +12,6 @@ import {
 
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
 import { Link, useLocation } from "react-router-dom";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -37,7 +36,7 @@ const drawerWidth = 260;
 const COLORS = {
   bg: "#161821",
   surfaceHover: "#1F2230",
-  activeBg: "rgba(201, 166, 107, 0.12)",
+  activeBg: "rgba(201,166,107,0.12)",
   accent: "#C9A66B",
   textPrimary: "#EDEEF2",
   textMuted: "#8A8F9C",
@@ -75,10 +74,27 @@ export default function Sidebar({ mobileOpen, onClose }) {
 
   const loadMenus = async () => {
     try {
-      const response = await menuService.getMenus();
-      setMenus(response.data.data);
+      const role = localStorage.getItem("role");
+
+      let response;
+
+      // ADMIN - Keep existing API
+      if (role === "admin") {
+        response = await menuService.getMenus();
+        setMenus(response.data.data || []);
+      }
+      // USER - Use new API
+      else {
+        response = await menuService.getMyMenus();
+
+        const allowedMenus = (response.data.data || []).filter(
+          (menu) => menu.can_view
+        );
+
+        setMenus(allowedMenus);
+      }
     } catch (error) {
-      console.error("Failed to load menus:", error);
+      console.error("Failed to load sidebar menus:", error);
     }
   };
 
@@ -116,11 +132,9 @@ export default function Sidebar({ mobileOpen, onClose }) {
                 borderRadius: 2,
                 color: isActive ? COLORS.accent : COLORS.textPrimary,
                 bgcolor: isActive ? COLORS.activeBg : "transparent",
-
                 "&:hover": {
                   bgcolor: COLORS.surfaceHover,
                 },
-
                 "&.Mui-selected": {
                   bgcolor: COLORS.activeBg,
                 },
@@ -160,7 +174,6 @@ export default function Sidebar({ mobileOpen, onClose }) {
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",

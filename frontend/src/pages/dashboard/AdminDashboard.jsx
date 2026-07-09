@@ -8,7 +8,6 @@ import {
   Typography,
   Grid,
   Container,
-  Paper
 } from "@mui/material";
 
 function AdminDashboard() {
@@ -31,8 +30,9 @@ function AdminDashboard() {
   return (
     <Box
       sx={{
-        backgroundColor: "#f4f6f8",
-        padding: 3
+        // Theme-aware instead of a fixed hex value — flips with dark mode
+        backgroundColor: "background.default",
+        padding: 3,
       }}
     >
       {/* HEADER */}
@@ -43,7 +43,6 @@ function AdminDashboard() {
 
         {/* CARDS SECTION */}
         <Grid container spacing={3}>
-
           {/* Total Users */}
           <Grid item xs={12} sm={6} md={3}>
             <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
@@ -71,9 +70,7 @@ function AdminDashboard() {
               </CardContent>
             </Card>
           </Grid>
-
         </Grid>
-
       </Container>
     </Box>
   );
